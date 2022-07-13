@@ -11,7 +11,7 @@ look at the files in dir
 ```
 list.files(dir)
 ```
-With python: 
+##With python: 
 ```
 import os
 os.listdir(r"C:\Users\Виталик\Documents\RNAproject\10x")
@@ -28,7 +28,7 @@ i try to make some tables for the single cell pipeline
 |                                   |import scanpy as sc
 
 After  I need to make a Seurat object in R  and AnnData object in Python(scanpy), from the files in directory
-using R
+##using R
 read data from the dir(barcodes, features/genes, matrix)
 ```
 data <- Read10X(data.dir = dir)
@@ -38,14 +38,14 @@ make a seurat object from the file.
 sob <- CreateSeuratObject(counts = data, project = "scdat", min.cells = 3,
                           min.features = 200)
 ```
-With python  
+##With python  
 ```
 dat = sc.read_10x_mtx(r"C:\Users\Виталик\Documents\RNAproject\10x", var_names="gene_symbols")
 ```
 In this place the pipelines are different. Here I try to the structure of a Seurat object, and AnnData
-Seurat
+#Seurat
 ![seur](https://user-images.githubusercontent.com/90727271/178681897-5cdb1904-0472-4ac1-9785-f4662d7688b5.jpg)
-AnnData
+#AnnData
 <img width="429" alt="AnnData" src="https://user-images.githubusercontent.com/90727271/178682481-147f011f-e804-4f0b-adc9-d0e9cd23f7a3.png">
 In the scanpy I can observe some differentially expression genes
 I should make variant names unique, for no count one gene as two or more name. 
@@ -60,13 +60,13 @@ sc.pl.highest_expr_genes(dat, n_top=20)
 ![exp1](https://user-images.githubusercontent.com/90727271/178683345-8756d50c-2009-43bc-b02d-8d176649dc3d.png)
 I could see a lot of genes with prefix “mt-” are  mitochondrial genes which usually went from disrupted cells, and the lider is malat1 it is a long noncoding RNA.
 During the both pipelines I need to filter out the cells with a lot of mitochondrial genes because of its tells as about cell damage. 
-with R
+##with R
 add another column with persentage of mitochondrial genes
 the genes have prefix "mt-"
 ```
 sob[["percent.mit"]] <- PercentageFeatureSet(sob, pattern = '^mt-')
 ```
-with python
+##with python
 Lets filter the set of genes with at least 200 genes
 ```
 sc.pp.filter_cells(dat, min_genes=200)
@@ -84,20 +84,20 @@ And calculate quality control metrics
 sc.pp.calculate_qc_metrics(dat, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
 ```
 After it, I make some plots for observe distributions, remember what I used the same data
-with R
+##with R
 ```
 VlnPlot(sob, features = c("nFeature_RNA", "nCount_RNA", "percent.mit"),
         ncol = 3)
 ```
 ![vlnpl](https://user-images.githubusercontent.com/90727271/178684636-ebce1417-c268-4e6c-a7cd-d71e8da21a89.jpg)
-Python
+##Python
 ```
 sc.pl.violin(dat, ['n_genes_by_counts', 'total_counts', 'pct_counts_mt'],
              jitter=0.4, multi_panel=True)
 ```
 ![pythonviol](https://user-images.githubusercontent.com/90727271/178686434-1b721533-b433-48a8-9e34-bf090b3797f7.png)
 So before the process of cutting some cells i should to observe counts and mitochondrial genes by plots
-R decision
+##R decision
 ```
 pl1 <- FeatureScatter(sob, feature1 = "nCount_RNA", 
                       feature2 = "nFeature_RNA")
@@ -109,7 +109,7 @@ pl1 + pl2
 ```
 ![scatterplot](https://user-images.githubusercontent.com/90727271/178687268-b219fa8e-b3a9-4d11-b4a6-c5c0ace6319c.jpg)
 
-Python decision
+##Python decision
 ```
 sc.pl.violin(dat, ['n_genes_by_counts', 'total_counts', 'pct_counts_mt'],
              jitter=0.4, multi_panel=True)
@@ -118,12 +118,12 @@ sc.pl.violin(dat, ['n_genes_by_counts', 'total_counts', 'pct_counts_mt'],
 |![pythonmit](https://user-images.githubusercontent.com/90727271/178688255-3c3a8047-285a-4779-a144-afb782109500.png) |![pythonfeat](https://user-images.githubusercontent.com/90727271/178688343-0a9d38d9-ff06-43d9-9ab3-09170d0e648d.png)
 From these plots, I'm trying to understand a threshold and filter out some genes with enormous mitochondrial genes expression and small gene expression (nFeature_RNA is the number of genes detected in each cell) , 
 nCount_RNA total number of molecules (reads) detected within a cell shouldn't be too large. 
-R decision
+##R decision
 after i can subset some genes
 ```
 sob <- subset(sob, subset = nFeature_RNA > 200 & nFeature_RNA < 4000 & percent.mit < 15)
 ```
-Python
+##Python
 filter out genes with counts < 4500 and percent of mitochondrial genes < 25
 ```
 adata = dat[dat.obs.n_genes_by_counts < 4500, :]
@@ -131,7 +131,7 @@ adata = dat[dat.obs.pct_counts_mt < 25, :]
 ```
 For avoid some replication problems i need use log normalisation. One good video about log normalization 
 https://www.youtube.com/watch?v=VSi0Z04fWj0&t=81s.
-R decision with lognormalization
+##R decision with lognormalization
 ```
 sob1 <- NormalizeData(sob, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
@@ -151,12 +151,12 @@ plot2 <- LabelPoints(plot = plot1, points = top10, repel = FALSE)
 plot1 + plot2
 ```
 ![higvar](https://user-images.githubusercontent.com/90727271/178699518-d6919bc9-e9d9-40e5-abdb-f7f48d63581e.jpg)
-and scanpy decision and plot
-#Identify highly-variable gen
+##and scanpy decision and plot
+###Identify highly-variable gen
 ```
 sc.pp.log1p(adata)
 ```
-#Identify highly-variable genes with some conditions
+###Identify highly-variable genes with some conditions
 ```
 sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
 ```
@@ -179,7 +179,7 @@ mean for every cell is 0, and sd = 1 after the process of normalization.
 ![scale](https://user-images.githubusercontent.com/90727271/178701731-a338dbdc-0b38-467d-ba74-6ec993021b8a.jpg)
 
 And now it is time for PCA analysis, one perfect video about PCA https://www.youtube.com/watch?v=FgakZw6K1QQ
-#R
+##R
 ```
 sob4 <- RunPCA(sob3, features = VariableFeatures(object = sob3))
 ```
@@ -192,7 +192,7 @@ DimHeatmap(sob4, dims = 1, cells = 500, balanced = TRUE)
 DimHeatmap(sob4, dims = 1:5, cells = 500, balanced = TRUE)
 ```
 ![rpca2](https://user-images.githubusercontent.com/90727271/178702989-70c41f2c-4c0c-440b-8dc2-49166d7d3f1a.jpg)
-#scanpy
+##scanpy
 pca and observe use two genes as color(B2m,Ly86)
 ```
 sc.tl.pca(adata, svd_solver='arpack')
@@ -209,7 +209,7 @@ JackStrawPlot(sob5, dims = 1:15)
 Observe elbow plot for PCA selection, with R
 ElbowPlot(sob5)
 ![elbow](https://user-images.githubusercontent.com/90727271/178704453-04bee1b8-a940-40ae-9c22-d20c1a11cf8d.jpg)
-and scanpy
+##and scanpy
 sc.pl.pca_variance_ratio(adata, log=True)
 ![elbowpyt](https://user-images.githubusercontent.com/90727271/178704718-a6a631e6-f98b-4a1b-9ba4-b983e9662c4f.png)
 
@@ -224,8 +224,8 @@ DimPlot(um, reduction = 'umap', label = TRUE)
 ```
 ![umapr](https://user-images.githubusercontent.com/90727271/178706655-d32687a5-47e8-4aeb-8f64-73ccc31898ea.jpg)
 
-#scanpy
-neighbors 
+##scanpy
+nearest neighbors method 
 ```
 sc.pp.neighbors(adata, n_neighbors=10, n_pcs=25)
 ```
@@ -243,7 +243,7 @@ sc.pl.umap(adata, color='leiden')
 ```
 ![pytumap](https://user-images.githubusercontent.com/90727271/178707263-e827f016-3ed6-403f-ade6-85acdaee2025.png)
 I am able to observe highly expressed genes in every cluster and used the top for manual annotation
-with R
+##with R
 find markers for every cluster compared to all remaining cells, report only the positive ones
 ```
 clmarkall <- FindAllMarkers(um, only.pos = TRUE, min.pct = 0.25,
