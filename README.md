@@ -346,6 +346,135 @@ maindim <- DimPlot(um, reduction = "umap", group.by = "mainlab", label = TRUE, l
                    label.box = TRUE)
 ```
 ![dimplotlm](https://user-images.githubusercontent.com/90727271/178713707-8035a1e9-0360-4d46-8f51-755cb74268a8.png)
+Install packages for enrichment analysis
+
+```
+library(biomaRt)
+library(escape)
+```
+Also, I need one gene set and one gene list 
+```
+gen_set <- idsub$entrezgene_id
+gen_set <- as.character(gen_set)
+```
+Durind the tutorial reading i had some problem with gen list sense understanding
+it should be the list of genes from my data, ordered by decreasing avg_log2FC
+Fist step I use bioMart for adding some others gene names from Ensembl, with getBM function
+and merge the results with my dataset of clusters, 
+```
+library(biomaRt)
+library(escape)
+GS.hallmark <- getGeneSets(library = "H")
+gene_id <- getBM(attributes = c("ensembl_gene_id", "external_gene_name",
+                                "entrezgene_id"), 
+                 mart = useDataset("mmusculus_gene_ensembl", useMart("ensembl")))
+id_marks <- merge(clmarkall, gene_id[,c(1,2,3)], by.x="gene", by.y="external_gene_name")
+```
+For the gen list I use not all my genes, only because of my laptop isn't very powerful, 
+so make a subset with log2FC some more than median value
+```
+id_marks$avg_log2FCid_marksrg <- id_marks %>%
+  arrange(desc(id_mark))
+summary(id_marksrg)
+idsub <- subset(id_marksrg, subset = avg_log2FC > 0.75)
+dim(id_marksrg)
+dim(idsub)
+```
+Ok, it is time to make gene set
+```
+gen_set <- idsub$entrezgene_id
+gen_set <- as.character(gen_set)
+```
+And the gene list 
+```
+genlog <- idsub$avg_log2FC
+names(genlog) <- as.character(idsub$entrezgene_id)
+genlog <- na.omit(genlog)
+genlist <- sort(genlog, decreasing = TRUE)
+```
+Need install two databases and make enrichment analysis with mice database
+```
+library(clusterProfiler)
+hsdb <- BiocManager::install("org.Hs.eg.db", force = TRUE)
+musdb <- BiocManager::install("org.Mm.eg.db", force = TRUE)
+engo <- enrichGO(gene = gen_set, OrgDb = musdb, pvalueCutoff = 0.05,
+                 ont = "all", readable = T)
+```
+I describe some about the GO object structure
+![go](https://user-images.githubusercontent.com/90727271/179626367-062b496d-bb04-40ba-b67c-b4ce138df05a.jpg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
