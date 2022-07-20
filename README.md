@@ -373,8 +373,8 @@ id_marks <- merge(clmarkall, gene_id[,c(1,2,3)], by.x="gene", by.y="external_gen
 For the gen list I use not all my genes, only because of my laptop isn't very powerful, 
 so make a subset with log2FC some more than median value
 ```
-id_marks$avg_log2FCid_marksrg <- id_marks %>%
-  arrange(desc(id_mark))
+id_marksrg <- id_marks %>%
+  arrange(desc(id_marks$avg_log2FC))
 summary(id_marksrg)
 idsub <- subset(id_marksrg, subset = avg_log2FC > 0.75)
 dim(id_marksrg)
@@ -402,6 +402,41 @@ engo <- enrichGO(gene = gen_set, OrgDb = musdb, pvalueCutoff = 0.05,
 ```
 I describe some about the GO object structure
 ![go](https://user-images.githubusercontent.com/90727271/179626367-062b496d-bb04-40ba-b67c-b4ce138df05a.jpg)
+#gene enrichment analysis can be visualyse with the dotplot
+```
+barplot(engo, showCategory = 20)
+```
+![barplotenrich](https://user-images.githubusercontent.com/90727271/179952392-9c453040-5c17-480b-b2b6-80176d18f127.png)
+#select go terms and other
+```
+engo2 <- engo@result[2,]
+```
+groupGO function
+``
+ggo1 <- groupGO(gene = gen_set, OrgDb = musdb, ont = 'CC',
+                level = 3, readable = TRUE)
+ggo1@result[1:3,]
+```
+After, I can use the site http://geneontology.org/
+for observing enrichGO results, for example I take the second object
+<img width="515" alt="enrichscr" src="https://user-images.githubusercontent.com/90727271/179960011-18fad418-9d19-4f20-8c35-510d32d7ff04.png">
+And paste it on the site, and observe result, it tell me about ubiquitin ligase complex, it is a cellular component, I had made groupGO analysis about cellular components(ont = 'CC'). 
+<img width="940" alt="gosite" src="https://user-images.githubusercontent.com/90727271/179960929-198e9f85-2838-4215-841f-5848685a938e.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
