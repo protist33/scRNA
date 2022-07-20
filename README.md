@@ -412,7 +412,7 @@ barplot(engo, showCategory = 20)
 engo2 <- engo@result[2,]
 ```
 groupGO function
-``
+```
 ggo1 <- groupGO(gene = gen_set, OrgDb = musdb, ont = 'CC',
                 level = 3, readable = TRUE)
 ggo1@result[1:3,]
