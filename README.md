@@ -422,7 +422,32 @@ for observing enrichGO results, for example I take the second object
 <img width="515" alt="enrichscr" src="https://user-images.githubusercontent.com/90727271/179960011-18fad418-9d19-4f20-8c35-510d32d7ff04.png">
 And paste it on the site, and observe result, it tell me about ubiquitin ligase complex, it is a cellular component, I had made groupGO analysis about cellular components(ont = 'CC'). 
 <img width="940" alt="gosite" src="https://user-images.githubusercontent.com/90727271/179960929-198e9f85-2838-4215-841f-5848685a938e.png">
+```
+gsego <- gseGO(geneList = genlist, OrgDb = get('org.Mm.eg.db'), ont = "CC", minGSSize = 100,
+              maxGSSize = 500, pvalueCutoff = 0.05, verbose = FALSE)
 
+gsego1 <- gseGO(geneList = genlist, OrgDb = get('org.Mm.eg.db'), ont = "BP", minGSSize = 100,
+               maxGSSize = 500, pvalueCutoff = 0.05, verbose = FALSE)
+
+dotplot(gsego, showCategory = 20)
+```
+![gsegobp](https://user-images.githubusercontent.com/90727271/180742661-d1f28bf9-7538-49c1-a00b-d5b63abc8d93.png)
+```
+gseaplot(gsego, geneSetID = 1, by = 'runningScore')
+```
+![gseaplot11](https://user-images.githubusercontent.com/90727271/180743963-a1b3f63e-d13b-485e-83bc-3a36a5d3a6cf.png)
+
+
+
+
+
+
+
+
+
+
+
+               
 
 
 
