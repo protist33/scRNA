@@ -437,6 +437,17 @@ gseaplot(gsego, geneSetID = 1, by = 'runningScore')
 ```
 ![gseaplot11](https://user-images.githubusercontent.com/90727271/180743963-a1b3f63e-d13b-485e-83bc-3a36a5d3a6cf.png)
 
+Now, after I show and understand some tools and steps lets back to my data, from research paper
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi
+they used two group of mice, control and stressed(n=15)
+something about the stress test
+![stresscondition](https://user-images.githubusercontent.com/90727271/182120451-2b33ee77-f97b-4a46-8319-82cae5aadfd3.jpg)
+Their mice were stressed durig 21 day and had 48 days for recovery, after they measure level of cortisol it was significantly higher for the
+stressed mice. Fur score(it means grouming conditions) is different too. 
+They were using Scanpy and defined 16 clusters in adrenal data, I had found twenty with Scanpy and eleven with the Seurat package
+from adrenal glands they outlined Abcb1b like one new molecular marker. It is significantly unique into the zona fasciculata cells.
+Three top genes were found as which what define this cells: Abcb1b, Sbsn, Srd5a2. These genes previously associated with GC transport, cell poliferation
+and glucose metabolism. Cyp11b1 expressed in all zona fasciculata cells(from zFasc1 to zFasc2). 
 
 
 
