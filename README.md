@@ -449,6 +449,18 @@ from adrenal glands they outlined Abcb1b like one new molecular marker. It is si
 Three top genes were found as which what define this cells: Abcb1b, Sbsn, Srd5a2. These genes previously associated with GC transport, cell poliferation
 and glucose metabolism. Cyp11b1 expressed in all zona fasciculata cells(from zFasc1 to zFasc2). 
 
+I look at the three genes from the original paper
+```
+features6 <- c('Abcb1a','Abcb1b', 'Sbsn', 'Srd5a2')
+FeaturePlot(um, features = features6)
+VlnPlot(um, features = features6)
+````
+I see some expression in the 7 cluster
+![abcb1a](https://user-images.githubusercontent.com/90727271/182140515-02fcaa5e-1f66-42cb-bd48-691dc98df1b9.png)
+and violine expression plot
+![abcbexp](https://user-images.githubusercontent.com/90727271/182140583-fe7959bd-1ded-44d3-a22a-9683f52ff99f.jpg)
+
+
 
 
 
