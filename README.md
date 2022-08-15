@@ -346,6 +346,61 @@ maindim <- DimPlot(um, reduction = "umap", group.by = "mainlab", label = TRUE, l
                    label.box = TRUE)
 ```
 ![dimplotlm](https://user-images.githubusercontent.com/90727271/178713707-8035a1e9-0360-4d46-8f51-755cb74268a8.png)
+##So I wanna add here some trajectory analysis, I hadn't made it before because have found one good tutorial and 
+finally understand how to do it, but need work for understand it deeper, ok, going to make the trajectory of my macrophages.
+```
+#monocle
+library(SingleCellExperiment)
+library(monocle3)
+```
+I use the monocle3 package and pipeline in the end of my Seurat process, 
+firstly subset only macrophages from the Seurat.
+```
+macro <- subset(um, main == 'Macrophages')
+```
+I make the object for monocle3 pipeline with as.cell_data_set
+```
+unique(macro@meta.data$seurat_clusters)
+cds1 <- as.cell_data_set(macro)
+```
+Start preparation for the graph 
+```
+fData(cds1)
+rownames(fData(cds1))[1:10]
+fData(cds1)$short_gene_name <- rownames(fData(cds1))
+counts(cds1)
+```
+Counts give me a matrix with counts, cells and genename,
+after I make partition as factor. 
+```
+recreate.partition <- c(rep(1, length(cds1@colData@rownames)))
+names(recreate.partition) <- cds1@colData@rownames
+recreate.partition <- as.factor(recreate.partition)
+red <- reducedDim(cds1, 'UMAP')
+cds1@clusters$UMAP <- red
+cds1@clusters$UMAP$partitions <- recreate.partition
+list_cl <- macro@active.ident
+cds1@clusters$UMAP$clusters <- list_cl
+cds1@int_colData@listData$reducedDims$UMAP <- macro@reductions$umap@cell.embeddings
+cl_name <- macro@meta.data$fine
+
+plot1 <- plot_cells(cds1,
+                    color_cells_by = 'cluster',
+                    label_groups_by_cluster = FALSE,
+                    group_label_size = 5) +
+  theme(legend.position = 'right')
+
+cds3 <- learn_graph(cds1, use_partition = FALSE)
+plot_cells(cds3,
+           color_cells_by = 'cluster',
+           label_groups_by_cluster = FALSE,
+           label_branch_points = FALSE,
+           label_roots = FALSE,
+           group_label_size = 5)
+
+```
+
+
 Install packages for enrichment analysis
 
 ```
