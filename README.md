@@ -346,6 +346,30 @@ maindim <- DimPlot(um, reduction = "umap", group.by = "mainlab", label = TRUE, l
                    label.box = TRUE)
 ```
 ![dimplotlm](https://user-images.githubusercontent.com/90727271/178713707-8035a1e9-0360-4d46-8f51-755cb74268a8.png)
+
+Exist a lot of packages for automated cluster annotation, which work with some different approaches
+![clustering](https://user-images.githubusercontent.com/90727271/185595697-9cbc6639-00a2-4801-9cb4-63193170a5a4.jpg)
+I am going to try some methods and packages with the same data for better understanding. Above I made analysis with singleR,
+and now trying scCATCH package from 
+https://github.com/ZJUFanLab/scCATCH
+```
+#scCATCH method
+install.packages("scCATCH")
+library('scCATCH')
+#clusters should be character
+clust <- as.character(um@meta.data$seurat_clusters)
+cat1 <- createscCATCH(um@assays$RNA@data, cluster = clust)
+cat2 <- findmarkergene(object = cat1, species = 'Mouse', 
+                       marker = cellmatch, tissue = 'Kidney',
+)
+cat3 <- findcelltype(cat2)
+```
+I made the picture with single cell object structure
+<img width="618" alt="catch object" src="https://user-images.githubusercontent.com/90727271/185597900-3338562f-93e7-43b3-bb60-64deafe0d634.png">
+I couldnt find the adrenal gland tissue, so I used kidney tissue references. I like what the package find some pubmed articles that are used
+for cluster annotation, so I could  make my own reference data with papeles manually. My 'macrophage clusters' are identifined as macrophage cells,
+as in my manually annotation and singleR
+reference 
 ##So I wanna add here some trajectory analysis, I hadn't made it before because have found one good tutorial and 
 finally understand how to do it, but need work for understand it deeper, ok, going to make the trajectory of my macrophages.
 ```
