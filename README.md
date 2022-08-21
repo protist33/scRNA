@@ -372,8 +372,106 @@ as in my manually annotation and singleR
 reference 
 ##So I wanna add here some trajectory analysis, I hadn't made it before because have found one good tutorial and 
 finally understand how to do it, but need work for understand it deeper, ok, going to make the trajectory of my macrophages.
+#Another way I try to understand the package "Clustifyr", have found some good tutorials and examples,
+and do it by two ways: one with separate matrix and metadata and another with the whole Seurat object
 ```
+BiocManager::install("clustifyr")
+library(clustifyr)
+library(ggplot2)
+library(cowplot)
+# this package can it one whole Seurat object,
+#but, firstly I make it by another way, separate matrix
+#and metadata from my Seurate object
+matr <- um@assays$RNA@data
+meta <- um@meta.data
+#my metadata hasn't umap, so I need extract it
+#and add manually 
+umap1 <- um@reductions$umap@cell.embeddings
+umap11 <- umap1[,1]
+umap22 <- umap1[,2]
+meta$UMAP_1 <- umap11
+meta$UMAP_2 <- umap22
+#I use my genes, ordered by log_FC
+genes <- marks$gene[1:500]
+#as a reference matrix I use the datahub
+BiocManager::install("clustifyrdatahub")
+#look at the useful datasets
+knitr::kable(dplyr::select(
+  read.csv(system.file("extdata", "metadata.csv", package = "clustifyrdatahub")),
+  c(1, 9, 2:7)))
+library(ExperimentHub)
+eh <- ExperimentHub()
+#wanna try two reference datasets
+refs <- query(eh, 'clustifyrdatahub')
+#mouse cell atlas
+refs_mous <- refs[['EH3444']]
+#ref mouse data from singleR Package 
+refs_mous2 <- refs[['EH3447']]
+#lets make the clustify function
+res <- clustify(input = matr, 
+                metadata = meta,
+                cluster_col = 'seurat_clusters',
+                ref_mat = refs_mous,
+                query_genes = genes)
+                
+#take it best for each cluster
+rescor <- cor_to_call(cor_mat = res,
+                    cluster_col = 'seurat_clusters')
+#add it to metadata
+meta2 <- call_to_metadata(res = rescor,
+                         metadata = meta,
+                         cluster_col = 'seurat_clusters')
+                         
+#plot_cor give me some errors I gonna fixed it later 
+plot_cor_heatmap(cor_mat = res)
+#plot similarity measures with umap
+corr_um <- plot_cor(cor_mat = res,
+                    metadata = meta,
+                    data_to_plot = colnames(res)[6:7],
+                    cluster_col = 'seurat_clusters')
+```
+![makrplot](https://user-images.githubusercontent.com/90727271/185801888-bb63209c-fdfd-4ea9-aa87-87de58bcb849.png)
+```
+#best types
+clust_types <- plot_best_call(cor_mat = res,
+                              metadata = meta,
+                              do_label = TRUE,
+                              do_legend = FALSE,
+                              cluster_col = 'seurat_clusters')   
+   #dimention plot(umap), colored by type
+known_types <- plot_dims(data = meta2,
+                         feature = 'type',
+                         do_label = TRUE,
+                         do_legend = FALSE
+                         ) + ggtitle("cell type")
+```
+#clust_type plot
+![clusttype](https://user-images.githubusercontent.com/90727271/185802270-61401773-75f0-42c1-91dd-776ee31a48b2.jpg)
+```
+plot_grid(known_types, clust_types)
+#and the simple way for using Seurat object 
+resseu <- clustify(input = um,
+                   ref_mat = refs_mous,
+                   cluster_col = 'seurat_clusters',
+                   obj_out = TRUE)
+                 
+resseu2 <- clustify(input = um,
+                    ref_mat = refs_mous2,
+                    cluster_col = 'seurat_clusters',
+                    obj_out = TRUE
+                    )   
+plotres1 <- DimPlot(resseu, reduction = 'umap', group.by = 'type', 
+                  label = TRUE, label.box = TRUE, label.size = 2)
+plotres2 <- DimPlot(resseu2, reduction = 'umap', group.by = 'type',
+                    label = TRUE, label.box = TRUE)
+```
+#With cell atlas annotatyon, I think what something wrong a lot of cells that could not be 
+![plotrefseq1](https://user-images.githubusercontent.com/90727271/185802352-950d32d1-3b9e-4ad0-af2a-d167be568f5d.png)
+and with another reference, it could see my lovely macrophages but don't understant the huge part of cells
+![plotrefseq2](https://user-images.githubusercontent.com/90727271/185802652-e109c38a-40b8-4195-8c34-a81da05f54c9.png)
+
 #monocle
+```
 library(SingleCellExperiment)
 library(monocle3)
 ```
@@ -423,8 +521,9 @@ plot_cells(cds3,
            group_label_size = 5)
 
 ```
+![traj2](https://user-images.githubusercontent.com/90727271/185802973-7b96f812-774f-460a-a6e4-98e8673d3798.png)
 
-
+Lets look at the enrichment analysis process
 Install packages for enrichment analysis
 
 ```
